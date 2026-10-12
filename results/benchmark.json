@@ -1,0 +1,92 @@
+{
+  "mysql_version": "8.4.2",
+  "synthetic_rows": 120000,
+  "query": "SELECT COUNT(*), COALESCE(SUM(amount_cents), 0)\nFROM reservations\nWHERE hotel_id = %s AND status = %s AND check_in >= %s AND check_in < %s",
+  "params": [
+    17,
+    "confirmed",
+    "2025-05-01",
+    "2025-08-01"
+  ],
+  "before": {
+    "median_ms": 35.973,
+    "min_ms": 34.035,
+    "max_ms": 50.937,
+    "rows": 291,
+    "amount_cents": 9925184,
+    "plan": {
+      "query_block": {
+        "select_id": 1,
+        "cost_info": {
+          "query_cost": "12101.25"
+        },
+        "table": {
+          "table_name": "reservations",
+          "access_type": "ALL",
+          "rows_examined_per_scan": 119970,
+          "rows_produced_per_join": 133,
+          "filtered": "0.11",
+          "cost_info": {
+            "read_cost": "12087.92",
+            "eval_cost": "13.33",
+            "prefix_cost": "12101.25",
+            "data_read_per_join": "13K"
+          },
+          "used_columns": [
+            "hotel_id",
+            "status",
+            "check_in",
+            "amount_cents"
+          ],
+          "attached_condition": "((`portfolio_booking_lab`.`reservations`.`status` = 'confirmed') and (`portfolio_booking_lab`.`reservations`.`hotel_id` = 17) and (`portfolio_booking_lab`.`reservations`.`check_in` >= DATE'2025-05-01') and (`portfolio_booking_lab`.`reservations`.`check_in` < DATE'2025-08-01'))"
+        }
+      }
+    }
+  },
+  "after": {
+    "median_ms": 1.463,
+    "min_ms": 0.937,
+    "max_ms": 2.841,
+    "rows": 291,
+    "amount_cents": 9925184,
+    "plan": {
+      "query_block": {
+        "select_id": 1,
+        "cost_info": {
+          "query_cost": "131.21"
+        },
+        "table": {
+          "table_name": "reservations",
+          "access_type": "range",
+          "possible_keys": [
+            "idx_hotel_status_arrival"
+          ],
+          "key": "idx_hotel_status_arrival",
+          "used_key_parts": [
+            "hotel_id",
+            "status",
+            "check_in"
+          ],
+          "key_length": "89",
+          "rows_examined_per_scan": 291,
+          "rows_produced_per_join": 291,
+          "filtered": "100.00",
+          "index_condition": "((`portfolio_booking_lab`.`reservations`.`status` = 'confirmed') and (`portfolio_booking_lab`.`reservations`.`hotel_id` = 17) and (`portfolio_booking_lab`.`reservations`.`check_in` >= DATE'2025-05-01') and (`portfolio_booking_lab`.`reservations`.`check_in` < DATE'2025-08-01'))",
+          "cost_info": {
+            "read_cost": "102.11",
+            "eval_cost": "29.10",
+            "prefix_cost": "131.21",
+            "data_read_per_join": "29K"
+          },
+          "used_columns": [
+            "hotel_id",
+            "status",
+            "check_in",
+            "amount_cents"
+          ]
+        }
+      }
+    }
+  },
+  "median_speedup": 24.59
+}
