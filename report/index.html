@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#17251e"><title>Query Field Notes · MySQL Booking Lab</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Fraunces:opsz,wght@9..144,400;9..144,600&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="layout">
+    <aside class="rail" aria-label="Report identity"><b>Q<span>✳</span></b><small>FIELD NOTE / 001</small><small>MYSQL 8.4</small></aside>
+    <main>
+      <header><a class="identity" href="#top">QUERY <em>FIELD NOTES</em></a><div><span>HOTEL BOOKING LAB</span><a href="../results/benchmark.json">SOURCE JSON ↗</a></div></header>
+      <section class="hero" id="top"><div class="hero-copy"><span class="eyebrow">● &nbsp; ONE QUERY. TWO PLANS. SAME RESULT.</span><h1>Make the database<br><em>do less work.</em></h1><p>One hotel report. 120,000 fictional reservations. A composite index changes how MySQL finds the answer.</p><div class="metadata"><span>01 / LOCAL BENCHMARK</span><span>20 RUNS PER STATE</span><span>SYNTHETIC DATA</span></div></div><div class="art" aria-hidden="true"><div class="disc">291</div><span>ROWS EXAMINED<br>AFTER INDEX</span></div></section>
+      <p id="error" class="error" role="alert" hidden>Could not load the captured result. Run <code>python -m http.server 8090</code> from the repository root and open <code>/report/</code>.</p>
+      <section class="results"><div class="heading"><div><small>02 / THE RESULT</small><h2>A narrower path<br>to the same answer.</h2></div><div class="speedup"><strong id="speedup">—</strong><span>FASTER MEDIAN<br>ON THIS MACHINE</span></div></div><div class="comparison"><article class="before"><div class="state-head">BEFORE / FULL SCAN <span>01</span></div><div class="time"><strong id="before-ms">—</strong><span>MS<br>MEDIAN</span></div><div class="track"><div id="before-bar"></div></div><div class="details"><span>ACCESS <b id="before-access">—</b></span><span>ROWS READ <b id="before-rows">—</b></span></div></article><article class="after"><div class="state-head">AFTER / COMPOSITE INDEX <span>02</span></div><div class="time"><strong id="after-ms">—</strong><span>MS<br>MEDIAN</span></div><div class="track"><div id="after-bar"></div></div><div class="details"><span>ACCESS <b id="after-access">—</b></span><span>ROWS READ <b id="after-rows">—</b></span></div></article></div><p class="integrity">✓ &nbsp; Both plans returned <b id="same-rows">—</b> bookings and the same revenue. Local synthetic timing is not a production result.</p></section>
+      <section class="method"><small>03 / THE METHOD</small><h2>What changed?</h2><p>The SQL and parameters stayed fixed. Only the access path changed.</p><div class="method-grid"><div class="code"><div>QUERY.SQL <span>UNCHANGED</span></div><pre>SELECT COUNT(*), COALESCE(SUM(amount_cents), 0)
+FROM reservations
+WHERE hotel_id = 17 AND status = 'confirmed'
+  AND check_in &gt;= '2025-05-01'
+  AND check_in &lt; '2025-08-01';</pre></div><div class="index"><small>THE CHANGE / 01</small><div><span>hotel_id</span><span>status</span><span>check_in</span></div><p>Equality columns narrow the hotel and status; the date column supports a range lookup within that slice.</p><code>CREATE INDEX idx_hotel_status_arrival<br>ON reservations (hotel_id, status, check_in);</code></div></div></section>
+      <footer><span>QUERY FIELD NOTES · PORTFOLIO EXPERIMENT</span><span>NO CLIENT DATA · NO PRODUCTION CLAIM</span><a href="https://github.com/juliosolis/mysql-booking-query-lab">GITHUB ↗</a></footer>
+    </main>
+  </div>
+  <script src="report.js" defer></script>
+</body>
+</html>
